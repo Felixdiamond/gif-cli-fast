@@ -1,14 +1,12 @@
 from itertools import groupby
 from io import BytesIO
 from PIL import GifImagePlugin, Image, ImageSequence
-
 import py256color
-
 
 class _Ascii:
     @staticmethod
     def pre(color):
-        red, green, blue = color
+        red, green, blue = color[:3]
         # These are the characters and weights used in jp2a by default
         # https://manpages.ubuntu.com/manpages/bionic/man1/jp2a.1.html
         characters = "   ...',;:clodxkO0KXNWM"
@@ -21,11 +19,10 @@ class _Ascii:
 
     reset = ""
 
-
 class _256Color:
     @staticmethod
     def pre(color):
-        return py256color.from_rgb(*color)
+        return py256color.from_rgb(*color[:3])
 
     @staticmethod
     def post(key, length):
@@ -33,11 +30,10 @@ class _256Color:
 
     reset = "\x1B[m"
 
-
 class _TrueColor:
     @staticmethod
     def pre(color):
-        return color
+        return tuple(color[:3])
 
     @staticmethod
     def post(key, length):
@@ -46,24 +42,19 @@ class _TrueColor:
 
     reset = "\x1B[m"
 
-
 _PROCESSORS = {
     "ascii": _Ascii,
     "256color": _256Color,
     "truecolor": _TrueColor,
 }
 
-
 def process(content, size, mode):
     GifImagePlugin.LOADING_STRATEGY = GifImagePlugin.LoadingStrategy.RGB_ALWAYS
     image = Image.open(BytesIO(content))
-
     imsize = image.size[0] * 2, image.size[1]
     scale = min(size[0] / imsize[0], size[1] / imsize[1], 1)
     imsize = int(scale * imsize[0]), int(scale * imsize[1])
-
     processor = _PROCESSORS[mode]
-
     return [
         (
             "\n".join(
@@ -84,7 +75,6 @@ def process(content, size, mode):
         )
         for frame in ImageSequence.Iterator(image)
     ]
-
 
 def _matrix(iterable, length):
     args = [iter(iterable)] * length
