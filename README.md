@@ -16,7 +16,7 @@ Usage
 ```
 usage: gif [-h] [--provider {giphy,tenor,local}]
            [--mode {ascii,256color,truecolor}] [--cols COLS] [--rows ROWS]
-           [--cache CACHE]
+           [--cache CACHE] [--loops loop_count]
            [query ...]
 
 positional arguments:
@@ -33,6 +33,7 @@ options:
   --cols COLS           terminal size. determined automatically by default
   --rows ROWS           terminal size. determined automatically by default
   --cache CACHE         cache directory. determined automatically by default
+  --loops loop_count    
 
 https://github.com/telnet23/gif-cli-fast
 ```
